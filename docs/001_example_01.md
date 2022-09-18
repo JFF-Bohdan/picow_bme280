@@ -36,7 +36,7 @@ Where the most important part would be `Active: active (running)` which means th
 MQTT server Mosquitto is up and running.
 
 Let's allow anonymous connections to our MQTT server on this stage, later we will do security hardening. To do this,
-please open `/etc/mosquitto/mosquitto.conf` and two lines:
+please open `/etc/mosquitto/mosquitto.conf` and add two lines:
 
 ```
 listener 1883
@@ -152,7 +152,7 @@ As it was mentioned in `README.md` we can use [`rshell`](https://github.com/dhyl
 files from `001-wireless-sensor` please execute (from repository root) command below:
 
 ```commandline
-rshell rsync ./picow/001-wireless-sensor/ /pyboard
+rshell rsync ./picow/001_wireless_sensor/ /pyboard
 ```
 
 It will upload all files (including `secrets.py` that you created manually) into your Pico W.
@@ -186,8 +186,8 @@ USER_NAME = None
 PASSWORD = None
 ```
 
-Then you can run `host/001-wireless-sensor/events_receiver.py` by executing
+Then you can run `host/001_wireless_sensor/events_receiver.py` by executing
 
 ```commandline
-python host\001-wireless-sensor\events_receiver.py
+python host/001-wireless-sensor/events_receiver.py
 ```

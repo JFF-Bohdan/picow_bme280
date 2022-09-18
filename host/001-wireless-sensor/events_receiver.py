@@ -32,6 +32,7 @@ def main():
 
     logger.info("Application started")
 
+    print(f"Connecting to '{MQTT_BROKER}' as client '{CLIENT_NAME}' (user '{USER_NAME}') to listen topic '{TOPIC}'")
     client = mqtt.Client(CLIENT_NAME)
     client.username_pw_set(USER_NAME, PASSWORD)
     client.connect(MQTT_BROKER)
