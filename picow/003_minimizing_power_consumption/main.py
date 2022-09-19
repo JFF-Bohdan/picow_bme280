@@ -164,11 +164,6 @@ def send_measurements(client: MQTTClient, enricher: Callable) -> None:
     client.publish(secrets.MQTT_TOPIC_PUB, msg=payload)
 
 
-def deactivate_wifi() -> None:
-    wlan = network.WLAN(network.STA_IF)
-    wlan.active(False)
-
-
 def main():
     try:
         print(f"Current timestamp is: {get_current_timestamp_iso()}")
@@ -202,8 +197,7 @@ def main():
             enricher=enricher
         )
 
-        deactivate_wifi()
-        time.sleep(consts.SLEEP_INTERVAL_BETWEEN_MEASUREMENTS_SECS)
+        time.sleep(consts.SLEEP_INTERVAL_BETWEEN_MEASUREMENTS)
         machine.reset()
     except Exception as e:
         print(f"Error in main loop: {e}")
@@ -215,3 +209,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
