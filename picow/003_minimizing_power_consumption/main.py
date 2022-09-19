@@ -209,6 +209,7 @@ def main():
 
         mqtt_client.disconnect()
         deactivate_wifi()
+        time.sleep(1)
 
         machine.Pin("WL_GPIO1", machine.Pin.OUT).low()
         machine.Pin(23, machine.Pin.OUT).low()
@@ -224,3 +225,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
