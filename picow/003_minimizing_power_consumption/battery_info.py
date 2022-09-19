@@ -1,4 +1,5 @@
 import machine
+import time
 
 
 class PicoWBatteryInfo(object):
@@ -21,14 +22,21 @@ class PicoWBatteryInfo(object):
         self._initialized = False
 
     @property
-    def current_voltage(self) -> float:
+    def current_voltage(self, samples_count: int = 5, delay_between_samples_ms: int = 20) -> float:
         try:
             if not self._initialized:
                 self._init()
 
             self._disable_wifi()
 
-            return self._vsys_adc.read_u16() * PicoWBatteryInfo.CONVERSION_FACTOR
+            samples = []
+            for index in range(samples_count):
+                if index > 1:
+                    time.sleep_ms(delay_between_samples_ms)
+
+                samples.append(self._vsys_adc.read_u16() * PicoWBatteryInfo.CONVERSION_FACTOR)
+
+            return sum(samples) / len(samples)
         finally:
             self._enable_wifi()
 
@@ -71,3 +79,4 @@ class PicoWBatteryInfo(object):
         # machine.Pin.PULL_UP
         self._spi_cs_control = machine.Pin(25, machine.Pin.OUT)
         self._initialized = True
+

@@ -19,6 +19,7 @@ from battery_info import PicoWBatteryInfo
 from internal_temperature_sensor import InternalTemperatureSensor
 from misc import get_machine_unique_id
 from retry_exception import retry_exception
+from uptime_counter import UptimeCounter
 
 try:
     from typing import Callable, Dict, Tuple
@@ -119,6 +120,7 @@ def enrich_metadata(
         packet: Dict,
         mac_address: str,
         internal_temp_sensor: InternalTemperatureSensor,
+        uptime_counter: UptimeCounter,
         current_voltage: float = None,
         charge_percentage: float = None
 ):
@@ -131,6 +133,7 @@ def enrich_metadata(
         "machine_unique_id": get_machine_unique_id(),
         "measurement_time": get_current_timestamp_iso(),
         "machine_metrics": {
+            "uptime": uptime_counter.uptime_ms(),
             "python_version": get_python_version(),
             "cpu_temperature": internal_temp_sensor.current_temperature(),
             "mem_free": gc.mem_free(),
@@ -164,8 +167,14 @@ def send_measurements(client: MQTTClient, enricher: Callable) -> None:
     client.publish(secrets.MQTT_TOPIC_PUB, msg=payload)
 
 
+def deactivate_wifi() -> None:
+    wlan = network.WLAN(network.STA_IF)
+    wlan.active(False)
+
+
 def main():
     try:
+        uptime_counter = UptimeCounter()
         print(f"Current timestamp is: {get_current_timestamp_iso()}")
 
         print("Measuring battery charge level")
@@ -181,7 +190,7 @@ def main():
         print("Confuguring current timestamp")
         setup_current_timestamp()
 
-        client = mqtt_connect()
+        mqtt_client = mqtt_connect()
 
         internal_temp_sensor = InternalTemperatureSensor()
         enricher = functools.partial(
@@ -189,24 +198,29 @@ def main():
             mac_address=mac_address,
             internal_temp_sensor=internal_temp_sensor,
             current_voltage=current_voltage,
-            charge_percentage=charge_percentage
+            charge_percentage=charge_percentage,
+            uptime_counter=uptime_counter
         )
 
         send_measurements(
-            client,
+            mqtt_client,
             enricher=enricher
         )
 
-        time.sleep(consts.SLEEP_INTERVAL_BETWEEN_MEASUREMENTS)
+        mqtt_client.disconnect()
+        deactivate_wifi()
+
+        machine.Pin("WL_GPIO1", machine.Pin.OUT).low()
+        machine.Pin(23, machine.Pin.OUT).low()
+        machine.deepsleep(consts.SLEEP_INTERVAL_BETWEEN_MEASUREMENTS_SECS * 1000)
         machine.reset()
     except Exception as e:
         print(f"Error in main loop: {e}")
         import sys
         sys.print_exception(e)
-        time.sleep(consts.SLEEP_INTERVAL_ON_ERROR_SECS)
+        machine.deepsleep(consts.SLEEP_INTERVAL_ON_ERROR_SECS * 1000)
         machine.reset()
 
 
 if __name__ == "__main__":
     main()
-
