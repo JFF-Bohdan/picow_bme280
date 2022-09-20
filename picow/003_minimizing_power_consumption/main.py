@@ -10,7 +10,7 @@ import ntptime
 import ubinascii
 import ujson
 from ucollections import namedtuple
-from umqtt.simple2 import MQTTClient
+from umqtt.simple import MQTTClient
 
 import consts
 import functools
@@ -46,7 +46,7 @@ def get_current_timestamp_iso() -> str:
     return f"{localtime[0]}-{localtime[1]:02}-{localtime[2]:02} {localtime[3]:02}:{localtime[4]:02}:{localtime[5]:02}"
 
 
-@retry_exception(attempts=3, delay_seconds=5)
+@retry_exception(attempts=2, delay_seconds=5)
 def read_bme280_values() -> Bme280Data:
     return Bme280Data(
         temperature=bme.values[0],
@@ -88,7 +88,7 @@ def connect_to_wifi() -> Tuple[str, str]:
     return ip, mac_address
 
 
-@retry_exception(attempts=5, delay_seconds=5)
+@retry_exception(attempts=2, delay_seconds=5)
 def mqtt_connect() -> MQTTClient:
     print(f"Trying connect to MQTT server - {secrets.MQTT_SERVER}")
     client = MQTTClient(
