@@ -67,4 +67,8 @@ In this example we are going to develop wireless sensor which would be able to t
 humidity and pressure to a host station via MQTT. In this example host system setup will be very simple 
 and will print received information to the console.
 
-Please follow [Example-1](./docs/example_01.md)
+Please follow [Example-1](./docs/001_basic_transmission_over_wifi)
+
+### Example 2 - battery powered (naive implementation)
+
+TBD
