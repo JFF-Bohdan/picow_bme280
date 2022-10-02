@@ -56,4 +56,3 @@ def retry_exception(attempts=5, delay_seconds=5, backoff_factor=2, exceptions=No
         return function_with_retries
 
     return decorator_retry
-

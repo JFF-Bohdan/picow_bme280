@@ -25,4 +25,3 @@ def reduce(function, iterable, initializer=None):
     for element in it:
         value = function(value, element)
     return value
-

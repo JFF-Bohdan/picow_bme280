@@ -188,7 +188,7 @@ def main():
         _, mac_address = connect_to_wifi()
 
         print("Confuguring current timestamp")
-        setup_current_timestamp()
+        # setup_current_timestamp()
 
         mqtt_client = mqtt_connect()
 
@@ -225,4 +225,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
